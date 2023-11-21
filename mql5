@@ -1,0 +1,69 @@
+mql5
+//+------------------------------------------------------------------+
+//|                                                Currency Power Meter Infinity mt4 |
+//|                                                  forexroboteasy.com |
+//|                                                  Developed by: Forex Robot Easy Team |
+//+------------------------------------------------------------------+
+
+//--- indicator settings
+#property indicator_chart_window
+#property indicator_buffers 1
+#property indicator_color1 Red
+
+//--- indicator parameters
+input int period = 14; // period for calculation
+
+//--- indicator buffers
+double ExtBuffer[];
+
+//+------------------------------------------------------------------+
+//| Custom indicator initialization function                         |
+//+------------------------------------------------------------------+
+int OnInit()
+{
+   //--- indicator buffers mapping
+   SetIndexBuffer(0, ExtBuffer);
+
+   //--- indicator buffers settings
+   SetIndexStyle(0, DRAW_LINE);
+   SetIndexLabel(0, 'Currency Power');
+
+   //--- set up the indicator name
+   IndicatorShortName('Currency Power Meter Infinity mt4');
+
+   return(INIT_SUCCEEDED);
+}
+
+//+------------------------------------------------------------------+
+//| Custom indicator iteration function                              |
+//+------------------------------------------------------------------+
+int OnCalculate(const int rates_total,
+                const int prev_calculated,
+                const datetime& time[],
+                const double& open[],
+                const double& high[],
+                const double& low[],
+                const double& close[],
+                const long& tick_volume[],
+                const long& volume[],
+                const int& spread[])
+{
+   //--- check for bars count
+   if(rates_total < period)
+      return(0);
+
+   //--- calculate the currency power
+   for(int i = period; i < rates_total; i++)
+   {
+      double currency_power = 0;
+
+      for(int j = 0; j < period; j++)
+         currency_power += MathAbs(close[i] - close[i - j]);
+
+      currency_power /= period;
+      ExtBuffer[i] = currency_power;
+   }
+
+   //--- return the number of calculated bars
+   return(rates_total);
+}
